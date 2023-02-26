@@ -14,10 +14,11 @@ server.listen(PORT, () => {
 //////ROUTES//////:
 //home page:
 server.get('/', homeHandler);
-//favorite:
 server.get('/favorite', favoriteHandler);
 server.get('/trending', trendingHandler);
 server.get('/search', searchHandler);
+server.get('/popular', popularHandler);
+server.get('/top_rated', topRatedHandler);
 server.get('*', defaultHandler);
 server.use((err, req, res, next) => {
     console.log(err.stack);
@@ -49,12 +50,12 @@ function trendingHandler(req, res) {
     //send a request to the API:
     const APIKey = process.env.APIKey;
     const url = `https://api.themoviedb.org/3/trending/all/week?api_key=${APIKey}`;
-    let axiosRes = axios.get(url)
+    axios.get(url)
         // res.send(axiosRes.data);
         .then((result) => {
             function trendingMovies(obj) {
                 let trending = [];
-                for (let i = 0; i < obj.results.length; i++)
+                for (let i = 0; i < obj.results.length; i++) {
                     trending.push({
                         id: obj.results[i].id,
                         title: obj.results[i].name,
@@ -62,24 +63,91 @@ function trendingHandler(req, res) {
                         poster_path: obj.results[i].poster_path,
                         overview: obj.results[i].overview,
                     });
+                }
                 return trending;
             }
-            const movieData = trendingMovies(axiosRes.data);
+            const movieData = trendingMovies(result.data);
             res.status(200).send(movieData);
         })
         .catch((err) => {
             res.status(500).send(err);
-        })
-
+        });
 };
+
 
 function searchHandler(req, res) {
     const APIKey = process.env.APIKey;
-    const url = `https://api.themoviedb.org/3/search/movie?api_key=${APIKey}&query=The&page=2`;
-    let axiosRes = axios.get(url)
-        .then((result) => {
-            res.status(200).send(axiosRes.data);
+    const url = `https://api.themoviedb.org/3/search/movie?api_key=${APIKey}&query=boy&page=2`;
+    axios.get(url)
+    .then((result) => {
+        function searchMovies(obj) {
+            let search = [];
+            for (let i = 0; i < obj.results.length; i++) {
+                search.push({
+                    id: obj.results[i].id,
+                    title: obj.results[i].original_title,
+                    release_date: obj.results[i].release_date,
+                    poster_path: obj.results[i].poster_path,
+                    overview: obj.results[i].overview,
+                });
+            }
+            return search;
+        }
+        const movieData = searchMovies(result.data);
+        res.status(200).send(movieData);
+    })
+        .catch((err) => {
+            res.status(500).send(err);
         })
+};
+
+function popularHandler(req, res) {
+    const APIKey = process.env.APIKey;
+    const url = `https://api.themoviedb.org/3/movie/popular?api_key=${APIKey}&language=en-US&page=1`;
+    axios.get(url)
+    .then((result) => {
+        function popularMovies(obj) {
+            let popular = [];
+            for (let i = 0; i < obj.results.length; i++) {
+                popular.push({
+                    id: obj.results[i].id,
+                    title: obj.results[i].original_title,
+                    release_date: obj.results[i].release_date,
+                    poster_path: obj.results[i].poster_path,
+                    overview: obj.results[i].overview,
+                });
+            }
+            return popular;
+        }
+        const movieData = popularMovies(result.data);
+        res.status(200).send(movieData);
+    })
+        .catch((err) => {
+            res.status(500).send(err);
+        })
+};
+
+function topRatedHandler(req, res) {
+    const APIKey = process.env.APIKey;
+    const url = `https://api.themoviedb.org/3/movie/top_rated?api_key=${APIKey}&language=en-US&page=1`;
+    axios.get(url)
+    .then((result) => {
+        function topRatedMovies(obj) {
+            let topRated = [];
+            for (let i = 0; i < obj.results.length; i++) {
+                topRated.push({
+                    id: obj.results[i].id,
+                    title: obj.results[i].original_title,
+                    release_date: obj.results[i].release_date,
+                    poster_path: obj.results[i].poster_path,
+                    overview: obj.results[i].overview,
+                });
+            }
+            return topRated;
+        }
+        const movieData = topRatedMovies(result.data);
+        res.status(200).send(movieData);
+    })
         .catch((err) => {
             res.status(500).send(err);
         })
