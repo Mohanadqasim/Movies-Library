@@ -14,18 +14,18 @@ const client = new pg.Client(process.env.DATABASE_URL);
 
 
 //////ROUTES//////:
-//home page:
-server.get('/', homeHandler);
-server.get('/favorite', favoriteHandler);
-server.get('/trending', trendingHandler);
-server.get('/search', searchHandler);
-server.get('/popular', popularHandler);
-server.get('/top_rated', topRatedHandler);
-server.get('/allmovies', getAllMoviesHandler)
-server.post('/allmovies', addAllMoviesHandler)
+server.get('/', home);
+server.get('/favorite', favorite);
+server.get('/trending', trending);
+server.get('/search', search);
+server.get('/popular', popular);
+server.get('/top_rated', topRated);
+server.get('/allmovies', getAllMovies)
+server.post('/addmovies', addAllMovies)
+server.delete('/deletemovie/:id',deleteAllMovies)
+server.put('/updatemovie/:id',updateAllMovies)
+server.get('/allmovies/:id', getAllMoviesById)
 server.get('*', defaultHandler);
-
-
 server.use((err, req, res, next) => {
     console.log(err.stack);
     res.status(500);
@@ -34,7 +34,7 @@ server.use((err, req, res, next) => {
 
 
 //////Functions Handlers/////
-function homeHandler(req, res) {
+function home(req, res) {
     const data = require('./Movie Data/data.json')
     function movies(obj) {
         return {
@@ -47,12 +47,12 @@ function homeHandler(req, res) {
     res.status(200).send(movieData);
 };
 
-function favoriteHandler(req, res) {
+function favorite(req, res) {
     let welcome = 'Welcome to Favorite Page';
     res.status(200).send(welcome);
 };
 
-function trendingHandler(req, res) {
+function trending(req, res) {
     //send a request to the API:
     const APIKey = process.env.APIKey;
     const url = `https://api.themoviedb.org/3/trending/all/week?api_key=${APIKey}`;
@@ -81,7 +81,7 @@ function trendingHandler(req, res) {
 };
 
 
-function searchHandler(req, res) {
+function search(req, res) {
     const APIKey = process.env.APIKey;
     const mov = req.query.name;
     const url = `https://api.themoviedb.org/3/search/movie?api_key=${APIKey}&query=${mov}&page=2`;
@@ -103,12 +103,12 @@ function searchHandler(req, res) {
         const movieData = searchMovies(result.data);
         res.status(200).send(movieData);
     })
-        .catch((err) => {
-            res.status(500).send(err);
-        })
+    .catch((err) => {
+        res.status(500).send(err);
+    });
 };
 
-function popularHandler(req, res) {
+function popular(req, res) {
     const APIKey = process.env.APIKey;
     const url = `https://api.themoviedb.org/3/movie/popular?api_key=${APIKey}&language=en-US&page=1`;
     axios.get(url)
@@ -129,12 +129,12 @@ function popularHandler(req, res) {
         const movieData = popularMovies(result.data);
         res.status(200).send(movieData);
     })
-        .catch((err) => {
-            res.status(500).send(err);
-        })
+    .catch((err) => {
+        res.status(500).send(err);
+    });
 };
 
-function topRatedHandler(req, res) {
+function topRated(req, res) {
     const APIKey = process.env.APIKey;
     const url = `https://api.themoviedb.org/3/movie/top_rated?api_key=${APIKey}&language=en-US&page=1`;
     axios.get(url)
@@ -155,12 +155,12 @@ function topRatedHandler(req, res) {
         const movieData = topRatedMovies(result.data);
         res.status(200).send(movieData);
     })
-        .catch((err) => {
-            res.status(500).send(err);
-        })
+    .catch((err) => {
+        res.status(500).send(err);
+    });
 };
 
-function getAllMoviesHandler (req,res) {
+function getAllMovies(req,res) {
     //return allMovies table content
     const sql = 'SELECT * FROM allmovies;'
     client.query(sql)
@@ -168,12 +168,12 @@ function getAllMoviesHandler (req,res) {
         res.send(data.rows);
 
     })
-    .catch ((err) => {
-       res.status(500).send(err);
-    })
+    .catch((err) => {
+        res.status(500).send(err);
+    });
 };
 
-function  addAllMoviesHandler (req,res) {
+function  addAllMovies(req,res) {
     const movie = req.body; 
     console.log(movie);
     const sql = `INSERT INTO allmovies (title,release_date,poster_path,overview) VALUES ($1,$2,$3,$4) RETURNING *;`
@@ -182,14 +182,55 @@ function  addAllMoviesHandler (req,res) {
 
     client.query(sql,values)
     .then((data) => {
-        res.send("your data was added !");
+        res.status(200).send(data.rows);
     })
-        .catch(error => {
-            // console.log(error);
-            errorHandler(error, req, res);
-        });
+    .catch((err) => {
+        res.status(500).send(err);
+    });
 }
 
+function deleteAllMovies(req,res) {
+    //delete some data from the database
+    const id = req.params.id;
+    const sql = `DELETE FROM allmovies WHERE id=${id}`;
+    client.query(sql)
+    .then((data)=>{
+        res.status(204);
+        res.send(data.rows);
+    })
+    .catch((err) => {
+        res.status(500).send(err);
+    });
+
+}
+
+function updateAllMovies(req,res) {
+    const id = req.params.id;
+    console.log(req.body);
+    console.log(id);
+    const sql = `UPDATE allmovies SET title=$1, release_date=$2, poster_path=$3, overview=$4 WHERE id=${id} RETURNING *`;
+    const values = [req.body.title,req.body.release_date,req.body.poster_path,req.body.overview];
+    client.query(sql,values)
+    .then((data)=>{
+        res.status(200).send(data.rows);
+    })
+    .catch((err) => {
+        res.status(500).send(err);
+    });
+}
+
+function getAllMoviesById(req,res) {
+    const id = req.params.id;
+    const sql = `SELECT * FROM allmovies WHERE id=${id};`
+    client.query(sql)
+    .then ((data)=>{
+        res.send(data.rows);
+
+    })
+    .catch((err) => {
+        res.status(500).send(err);
+    });
+}
 
 function defaultHandler(req, res) {
     console.log('404 Not Found');
