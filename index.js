@@ -5,28 +5,28 @@ const axios = require('axios');
 require('dotenv').config();
 const pg = require('pg');//importing pg library
 const { request } = require('express');
-const index = express();
-index.use(express.json());
-index.use(cors());
-index.use(express.json());
+const app = express();
+app.use(express.json());
+app.use(cors());
+app.use(express.json());
 const PORT = process.env.PORT || 3000;
 const client = new pg.Client(process.env.DATABASE_URL);
 
 
 //////ROUTES//////:
-index.get('/', home);
-index.get('/favorite', favorite);
-index.get('/trending', trending);
-index.get('/search', search);
-index.get('/popular', popular);
-index.get('/top_rated', topRated);
-index.get('/allmovies', getAllMovies)
-index.post('/addmovies', addAllMovies)
-index.delete('/deletemovie/:id',deleteAllMovies)
-index.put('/updatemovie/:id',updateAllMovies)
-index.get('/allmovies/:id', getAllMoviesById)
-index.get('*', defaultHandler);
-index.use((err, req, res, next) => {
+app.get('/', home);
+app.get('/favorite', favorite);
+app.get('/trending', trending);
+app.get('/search', search);
+app.get('/popular', popular);
+app.get('/top_rated', topRated);
+app.get('/allmovies', getAllMovies)
+app.post('/addmovies', addAllMovies)
+app.delete('/deletemovie/:id', deleteAllMovies)
+app.put('/updatemovie/:id', updateAllMovies)
+app.get('/allmovies/:id', getAllMoviesById)
+app.get('*', defaultHandler);
+app.use((err, req, res, next) => {
     console.log(err.stack);
     res.status(500);
     res.send('500 Server Error');
@@ -86,150 +86,150 @@ function search(req, res) {
     const mov = req.query.name;
     const url = `https://api.themoviedb.org/3/search/movie?api_key=${APIKey}&query=${mov}&page=2`;
     axios.get(url)
-    .then((result) => {
-        function searchMovies(obj) {
-            let search = [];
-            for (let i = 0; i < obj.results.length; i++) {
-                search.push({
-                    id: obj.results[i].id,
-                    title: obj.results[i].original_title,
-                    release_date: obj.results[i].release_date,
-                    poster_path: obj.results[i].poster_path,
-                    overview: obj.results[i].overview,
-                });
+        .then((result) => {
+            function searchMovies(obj) {
+                let search = [];
+                for (let i = 0; i < obj.results.length; i++) {
+                    search.push({
+                        id: obj.results[i].id,
+                        title: obj.results[i].original_title,
+                        release_date: obj.results[i].release_date,
+                        poster_path: obj.results[i].poster_path,
+                        overview: obj.results[i].overview,
+                    });
+                }
+                return search;
             }
-            return search;
-        }
-        const movieData = searchMovies(result.data);
-        res.status(200).send(movieData);
-    })
-    .catch((err) => {
-        res.status(500).send(err);
-    });
+            const movieData = searchMovies(result.data);
+            res.status(200).send(movieData);
+        })
+        .catch((err) => {
+            res.status(500).send(err);
+        });
 };
 
 function popular(req, res) {
     const APIKey = process.env.APIKey;
     const url = `https://api.themoviedb.org/3/movie/popular?api_key=${APIKey}&language=en-US&page=1`;
     axios.get(url)
-    .then((result) => {
-        function popularMovies(obj) {
-            let popular = [];
-            for (let i = 0; i < obj.results.length; i++) {
-                popular.push({
-                    id: obj.results[i].id,
-                    title: obj.results[i].original_title,
-                    release_date: obj.results[i].release_date,
-                    poster_path: obj.results[i].poster_path,
-                    overview: obj.results[i].overview,
-                });
+        .then((result) => {
+            function popularMovies(obj) {
+                let popular = [];
+                for (let i = 0; i < obj.results.length; i++) {
+                    popular.push({
+                        id: obj.results[i].id,
+                        title: obj.results[i].original_title,
+                        release_date: obj.results[i].release_date,
+                        poster_path: obj.results[i].poster_path,
+                        overview: obj.results[i].overview,
+                    });
+                }
+                return popular;
             }
-            return popular;
-        }
-        const movieData = popularMovies(result.data);
-        res.status(200).send(movieData);
-    })
-    .catch((err) => {
-        res.status(500).send(err);
-    });
+            const movieData = popularMovies(result.data);
+            res.status(200).send(movieData);
+        })
+        .catch((err) => {
+            res.status(500).send(err);
+        });
 };
 
 function topRated(req, res) {
     const APIKey = process.env.APIKey;
     const url = `https://api.themoviedb.org/3/movie/top_rated?api_key=${APIKey}&language=en-US&page=1`;
     axios.get(url)
-    .then((result) => {
-        function topRatedMovies(obj) {
-            let topRated = [];
-            for (let i = 0; i < obj.results.length; i++) {
-                topRated.push({
-                    id: obj.results[i].id,
-                    title: obj.results[i].original_title,
-                    release_date: obj.results[i].release_date,
-                    poster_path: obj.results[i].poster_path,
-                    overview: obj.results[i].overview,
-                });
+        .then((result) => {
+            function topRatedMovies(obj) {
+                let topRated = [];
+                for (let i = 0; i < obj.results.length; i++) {
+                    topRated.push({
+                        id: obj.results[i].id,
+                        title: obj.results[i].original_title,
+                        release_date: obj.results[i].release_date,
+                        poster_path: obj.results[i].poster_path,
+                        overview: obj.results[i].overview,
+                    });
+                }
+                return topRated;
             }
-            return topRated;
-        }
-        const movieData = topRatedMovies(result.data);
-        res.status(200).send(movieData);
-    })
-    .catch((err) => {
-        res.status(500).send(err);
-    });
+            const movieData = topRatedMovies(result.data);
+            res.status(200).send(movieData);
+        })
+        .catch((err) => {
+            res.status(500).send(err);
+        });
 };
 
-function getAllMovies(req,res) {
+function getAllMovies(req, res) {
     //return allMovies table content
     const sql = 'SELECT * FROM allmovies;'
     client.query(sql)
-    .then ((data)=>{
-        res.send(data.rows);
+        .then((data) => {
+            res.send(data.rows);
 
-    })
-    .catch((err) => {
-        res.status(500).send(err);
-    });
+        })
+        .catch((err) => {
+            res.status(500).send(err);
+        });
 };
 
-function  addAllMovies(req,res) {
-    const movie = req.body; 
+function addAllMovies(req, res) {
+    const movie = req.body;
     console.log(movie);
     const sql = `INSERT INTO allmovies (title,release_date,poster_path,overview) VALUES ($1,$2,$3,$4) RETURNING *;`
     const values = [movie.title, movie.release_date, movie.poster_path, movie.overview];
     console.log(sql);
 
-    client.query(sql,values)
-    .then((data) => {
-        res.status(200).send(data.rows);
-    })
-    .catch((err) => {
-        res.status(500).send(err);
-    });
+    client.query(sql, values)
+        .then((data) => {
+            res.status(200).send(data.rows);
+        })
+        .catch((err) => {
+            res.status(500).send(err);
+        });
 }
 
-function deleteAllMovies(req,res) {
+function deleteAllMovies(req, res) {
     //delete some data from the database
     const id = req.params.id;
     const sql = `DELETE FROM allmovies WHERE id=${id}`;
     client.query(sql)
-    .then((data)=>{
-        res.status(204);
-        res.send(data.rows);
-    })
-    .catch((err) => {
-        res.status(500).send(err);
-    });
+        .then((data) => {
+            res.status(204);
+            res.send(data.rows);
+        })
+        .catch((err) => {
+            res.status(500).send(err);
+        });
 
 }
 
-function updateAllMovies(req,res) {
+function updateAllMovies(req, res) {
     const id = req.params.id;
     console.log(req.body);
     console.log(id);
     const sql = `UPDATE allmovies SET title=$1, release_date=$2, poster_path=$3, overview=$4 WHERE id=${id} RETURNING *`;
-    const values = [req.body.title,req.body.release_date,req.body.poster_path,req.body.overview];
-    client.query(sql,values)
-    .then((data)=>{
-        res.status(200).send(data.rows);
-    })
-    .catch((err) => {
-        res.status(500).send(err);
-    });
+    const values = [req.body.title, req.body.release_date, req.body.poster_path, req.body.overview];
+    client.query(sql, values)
+        .then((data) => {
+            res.status(200).send(data.rows);
+        })
+        .catch((err) => {
+            res.status(500).send(err);
+        });
 }
 
-function getAllMoviesById(req,res) {
+function getAllMoviesById(req, res) {
     const id = req.params.id;
     const sql = `SELECT * FROM allmovies WHERE id=${id};`
     client.query(sql)
-    .then ((data)=>{
-        res.send(data.rows);
+        .then((data) => {
+            res.send(data.rows);
 
-    })
-    .catch((err) => {
-        res.status(500).send(err);
-    });
+        })
+        .catch((err) => {
+            res.status(500).send(err);
+        });
 }
 
 function defaultHandler(req, res) {
@@ -238,12 +238,14 @@ function defaultHandler(req, res) {
     res.send('404 Not Found');
 };
 
-//connect the server with the DataBase:
-client.connect()
-.then (() => {
-    index.listen(PORT, () => {
-        console.log(`Listening on ${PORT}: I am ready`)
-    })
+// //connect the server with the DataBase:
+// client.connect()
+// .then (() => {
+//     app.listen(PORT, () => {
+//         console.log(`Listening on ${PORT}: I am ready`)
+//     })
+// })
+app.listen(PORT, () => {
+    console.log(`Listening on ${PORT}: I am ready`)
 })
-
 
