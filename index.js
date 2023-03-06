@@ -238,14 +238,14 @@ function defaultHandler(req, res) {
     res.send('404 Not Found');
 };
 
-// //connect the server with the DataBase:
-// client.connect()
-// .then (() => {
-//     app.listen(PORT, () => {
-//         console.log(`Listening on ${PORT}: I am ready`)
-//     })
-// })
-app.listen(PORT, () => {
-    console.log(`Listening on ${PORT}: I am ready`)
+//connect the server with the DataBase:
+client.connect()
+.then (() => {
+    app.listen(PORT, () => {
+        console.log(`Listening on ${PORT}: I am ready`)
+    })
 })
+// app.listen(PORT, () => {
+//     console.log(`Listening on ${PORT}: I am ready`)
+// })
 
