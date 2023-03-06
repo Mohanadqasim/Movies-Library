@@ -5,28 +5,28 @@ const axios = require('axios');
 require('dotenv').config();
 const pg = require('pg');//importing pg library
 const { request } = require('express');
-const server = express();
-server.use(express.json());
-server.use(cors());
-server.use(express.json());
+const index = express();
+index.use(express.json());
+index.use(cors());
+index.use(express.json());
 const PORT = process.env.PORT || 3000;
 const client = new pg.Client(process.env.DATABASE_URL);
 
 
 //////ROUTES//////:
-server.get('/', home);
-server.get('/favorite', favorite);
-server.get('/trending', trending);
-server.get('/search', search);
-server.get('/popular', popular);
-server.get('/top_rated', topRated);
-server.get('/allmovies', getAllMovies)
-server.post('/addmovies', addAllMovies)
-server.delete('/deletemovie/:id',deleteAllMovies)
-server.put('/updatemovie/:id',updateAllMovies)
-server.get('/allmovies/:id', getAllMoviesById)
-server.get('*', defaultHandler);
-server.use((err, req, res, next) => {
+index.get('/', home);
+index.get('/favorite', favorite);
+index.get('/trending', trending);
+index.get('/search', search);
+index.get('/popular', popular);
+index.get('/top_rated', topRated);
+index.get('/allmovies', getAllMovies)
+index.post('/addmovies', addAllMovies)
+index.delete('/deletemovie/:id',deleteAllMovies)
+index.put('/updatemovie/:id',updateAllMovies)
+index.get('/allmovies/:id', getAllMoviesById)
+index.get('*', defaultHandler);
+index.use((err, req, res, next) => {
     console.log(err.stack);
     res.status(500);
     res.send('500 Server Error');
@@ -241,7 +241,7 @@ function defaultHandler(req, res) {
 //connect the server with the DataBase:
 client.connect()
 .then (() => {
-    server.listen(PORT, () => {
+    index.listen(PORT, () => {
         console.log(`Listening on ${PORT}: I am ready`)
     })
 })
