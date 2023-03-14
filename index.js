@@ -9,7 +9,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 app.use(express.json());
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3003;
 const client = new pg.Client(process.env.DATABASE_URL);
 
 
@@ -245,7 +245,3 @@ client.connect()
         console.log(`Listening on ${PORT}: I am ready`)
     })
 })
-// app.listen(PORT, () => {
-//     console.log(`Listening on ${PORT}: I am ready`)
-// })
-
