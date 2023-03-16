@@ -176,8 +176,8 @@ function getAllMovies(req, res) {
 function addAllMovies(req, res) {
     const movie = req.body;
     console.log(movie);
-    const sql = `INSERT INTO allmovies (title,release_date,poster_path,overview) VALUES ($1,$2,$3,$4) RETURNING *;`
-    const values = [movie.title, movie.release_date, movie.poster_path, movie.overview];
+    const sql = `INSERT INTO allmovies (title,release_date,poster_path,overview,feedback) VALUES ($1,$2,$3,$4,$5) RETURNING *;`
+    const values = [movie.title, movie.release_date, movie.poster_path, movie.overview, movie.feedback];
     console.log(sql);
 
     client.query(sql, values)
