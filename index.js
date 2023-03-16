@@ -208,8 +208,8 @@ function updateAllMovies(req, res) {
     const id = req.params.id;
     console.log(req.body);
     console.log(id);
-    const sql = `UPDATE allmovies SET title=$1, release_date=$2, poster_path=$3, overview=$4 WHERE id=${id} RETURNING *`;
-    const values = [req.body.title, req.body.release_date, req.body.poster_path, req.body.overview];
+    const sql = `UPDATE allmovies SET title=$1, release_date=$2, poster_path=$3, overview=$4, feedback=$5 WHERE id=${id} RETURNING *`;
+    const values = [req.body.title, req.body.release_date, req.body.poster_path, req.body.overview, req.body.feedback];
     client.query(sql, values)
         .then((data) => {
             res.status(200).send(data.rows);
